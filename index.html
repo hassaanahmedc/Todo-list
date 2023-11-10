@@ -33,12 +33,13 @@
             </div>
             <ul>
                 <template x-for="(task, index) in tasks">
-                    <li x-text="task" class="list-disc px-2 mt-2 text-sm border-b border-gray-300">
+                    <li  class="list-disc flex justify-between px-2 mt-2 text-sm border-b border-gray-300">
+                        <span x-text="task">
+                        </span>
                         <button x-on:click="removeTask(index)" class="text-red-600 ml-2" title="Remove">Remove</button>
                     </li>
                 </template>
             </ul>
-
         </div>
     </section>
 </body>
