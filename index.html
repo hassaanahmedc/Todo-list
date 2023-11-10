@@ -10,36 +10,73 @@
 </head>
 
 <body class="bg-gray-300 ">
-    <section class="mx-auto w-1/2 flex flex-col justify-center h-screen " x-data="{tasks: [],
-      newTasks: '',
-      addTasks: function(){
-        if (this.newTasks.trim() != '') {
-          this.tasks.push(this.newTasks);
-          this.newTasks = '';
+    <!-- Main Section -->
+    <section class="mx-auto w-1/2 flex flex-col justify-center h-screen" x-data="{
+        tasks: JSON.parse(localStorage.getItem('tasks')) || [],
+        newTask: '',
+        editingIndex : null,
+        modal: false,
+        addTask: function() {
+            if (this.newTask.trim() !== '') {
+                this.tasks.push(this.newTask);
+                this.newTask = '';
+                this.saveTasks();
+            }
+        },
+        editTask: function() {
+            if (this.editingIndex  !== null && this.editingIndex  >= 0 && this.editingIndex  < this.tasks.length) {
+                 this.newTask = this.tasks[this.editingIndex];
+                this.saveTasks();
+
+                this.newTask = '';
+                this.modal = false;
+                this.editingIndex  = null;
+            };
+        },
+
+        removeTask: function(index) {
+            this.tasks.splice(index, 1);
+            this.saveTasks();
+        },
+        
+        saveTasks: function() {
+            localStorage.setItem('tasks', JSON.stringify(this.tasks));
         }
-      },
-      removeTask: function(index) {
-        this.tasks.splice(index, 1);
-      }}">
+    }">
+        <!-- Add Todo Tasks -->
         <div id="todo_container" class="mx-0 p-8  bg-white rounded-xl">
             <h6 class="font-bold text-gray-600 mb-2">Todo List</h6>
             <div class="flex justify-center items-center mb-4">
-                <textarea x-model="newTasks" type="text"
+                <textarea x-model="newTask" type="text"
                     class="p-2 text-sm border rounded focus:outline-none border-slate-500 w-5/6" name="todo_work"
                     placeholder="What do you need to do today?"></textarea>
-                <button x-on:click="addTasks" class="bg-sky-600 text-white px-5 py-1 rounded ms-2">
-                    Add
-                </button>
+                <button x-on:click="addTask" class="bg-sky-600 text-white px-5 py-1 rounded ms-2">Add</button>
             </div>
+            <!-- Todo Tasks -->
             <ul>
-                <template x-for="(task, index) in tasks">
-                    <li  class="list-disc flex justify-between px-2 mt-2 text-sm border-b border-gray-300">
-                        <span x-text="task">
-                        </span>
-                        <button x-on:click="removeTask(index)" class="text-red-600 ml-2" title="Remove">Remove</button>
+                <template x-for="(task, index) in tasks" :key="index">
+                    <li class="list-disc flex justify-between px-2 mt-2 text-sm border-b border-gray-300">
+                        <span x-text="task"></span>
+                        <div>
+                            <button x-on:click="modal = !modal; editingIndex  = index" class="text-green-600 ml-2"
+                                title="Remove">Edit</button>
+                            <button x-on:click="removeTask(index)" class="text-red-600 ml-2"
+                                title="Remove">Remove</button>
+                        </div>
                     </li>
                 </template>
             </ul>
+            <!-- Modal Container that will be opened on edit button -->
+            <div id="modal" x-cloak x-show="modal"
+                class="bg-slate-500/50 fixed top-0 left-0 w-full h-screen flex justify-center items-center l">
+                <div x-on:click.outside="modal = !modal"
+                    class="flex justify-center items-center mb-4 mx-0 p-8  bg-white rounded-x">
+                    <textarea x-model.lazy="tasks[editingIndex]" type="text"
+                        class="p-2 text-sm border rounded focus:outline-none border-slate-500 w-5/6"
+                        name="todo_work"></textarea>
+                    <button x-on:click="editTask" class="bg-sky-600 text-white px-5 py-1 rounded ms-2">Edit</button>
+                </div>
+            </div>
         </div>
     </section>
 </body>
